@@ -10,10 +10,12 @@ public class Arbol{
     ArrayList<Arbol> hijos;
     Arbol padre;
     int profundidad;
+    boolean explorado;
     Arbol(){
         this.cadenaMovimientos = new ArrayList<>();
         this.hijos = new ArrayList<>();
         this.profundidad = 0;
+        this.explorado = false;
     }
     
     // agregamos una funcion para agregar un movimiento al arbol
@@ -48,5 +50,12 @@ public class Arbol{
     // agregamos una funcion para obtener el padre del nodo
     public Arbol getPadre(){
         return padre;
+    }
+
+    public boolean explorado(){
+        return this.explorado;
+    }
+    public void explorando(){
+        this.explorado = true;
     }
 }

@@ -1,11 +1,12 @@
 import java.util.ArrayList;
 
 /**
- * En esta clase implementaremos un algoritmo de busqueda en anchura
+ * En esta clase implementaremos un algoritmo de busqueda en profundidad
  * para resolver el puzzle, guardaremos los nodos (movimientos) en una
  * lista de movimientos para al final mostrarlos en orden correcto
- * El algoritmo de busqueda en anchura es un algoritmo de busqueda
- * no informada que expande y examina todos los nodos de un nivel
+ * El algoritmo de busqueda en amplitud es un algoritmo de busqueda
+ * que expande la profundidad total de cada nodo y examina todos los
+ * nodos de un nivel desde la mayor profundidad a la
  * antes de pasar al siguiente nivel de nodos  
  */
 public class Profundidad {
@@ -36,6 +37,7 @@ public class Profundidad {
         for (movimiento movimiento : solucion) {
             puzzle.mover(movimiento.xDestino, movimiento.yDestino, movimiento.xOrigen, movimiento.yOrigen);
         }
+
         puzzle.movimientos = 0;
     }
 
@@ -109,73 +111,64 @@ public class Profundidad {
     }
 
     /**
-     * Ahora agregaremos al un nivel de profundidad usando la funcion
-     * anterior, para ello crearemos una funcion que agregue un nivel
-     * de profundidad al arbol de movimientos
-     *
+     * Abriremos el arbol en su totalidad para luego buscarle la solucion
+     * @param arbol
+     * @param profundidad
      */
-    public void addProfundidad(Arbol arbol, int profundidad){
-        // aumentamos la profundidad
-        //System.out.println("Profundidad: "+profundidad+" Movimientos: "+arbol.getMovimientos().size()+" Movimientos Maximos: "+movimientosMaximos+"");
-        profundidad++;
-        if (profundidad > movimientosMaximos) return;
-        // obtenemos los movimientos validos
-        ArrayList<movimiento> movimientosValidos = getMovimientosValidos(arbol);
-        // agregamos los movimientos validos al arbol
-        for (movimiento movimiento : movimientosValidos) {
-            arbol.addHijo(movimiento, profundidad);
+    public void abrirArbol(Arbol arbol, int profundidad){
+        if (profundidad<=this.movimientosMaximos){
+            ArrayList<movimiento> movimientosHijo = getMovimientosValidos(arbol);
+            for (movimiento movimientoHijo : movimientosHijo) {
+                arbol.addHijo(movimientoHijo, profundidad);
+            }
+            ArrayList<Arbol> hijos = arbol.getHijos();
+            for (Arbol hijo : hijos) {
+                abrirArbol(hijo, profundidad+1);
+            }
+            arbol.explorando();
+            if(this.solucion.isEmpty() && comprobarCadena(arbol)){
+                this.solucion = arbol.getMovimientos();
+            }
+            arbol.explorado();
         }
-        // si la profundidad es menor al maximo de movimientos
-        // verificamos si alguno de los hijos del arbol es la solucion
-        if (verificarCadenas(arbol)) return;
     }
 
     /**
-     * Ahora verificaremos cada una de las cadenas de movimientos
-     * para cada uno de los nuevos hijos del arbol
+     * Verificaremos si una cadena de movimientos de un arbol es meta
+     * @param arbol
+     * @return true o false dependiendo de la cadena
      */
-    public boolean verificarCadenas(Arbol arbolMovimientos){
-        //System.out.print("Verificando cadenas | ");
-        // obtenemos los hijos del arbol
-        ArrayList<Arbol> hijos = arbolMovimientos.getHijos();
-        // verificamos si el arbol tiene hijos
-        // recorremos los hijos
-        //System.out.println("Hijos: "+hijos.size());
-        for (Arbol hijo : hijos) {
-            // obtenemos los movimientos del hijo
-            ArrayList<movimiento> movimientos = hijo.getMovimientos();
-            //System.out.println("Profundidad: "+hijo.profundidad+" Movimientos: "+movimientos.size()+" Movimientos Maximos: "+movimientosMaximos+"");
-            // recorremos los movimientos
-            for (movimiento movimiento : movimientos) {
-                // movemos el bloque
-                //System.out.println("Moviendo: "+movimiento.xOrigen+", "+movimiento.yOrigen+" -> "+movimiento.xDestino+", "+movimiento.yDestino);
-                puzzle.mover(movimiento.xDestino, movimiento.yDestino, movimiento.xOrigen, movimiento.yOrigen);
-            }
-            // verificamos si el puzzle esta resuelto
-            if(movimientos.size()>1){
-                //puzzle.showMatriz();
-                //System.out.println("esFinal: "+puzzle.esFinal());
-            }
-            if (puzzle.esFinal()){
-                // si el puzzle esta resuelto guardamos la solucion
-                // System.out.println("Solucion encontrada");
-                solucion = movimientos;
-                // salimos del ciclo
-                return true;
-            }
-            // si el puzzle no esta resuelto agregamos un nivel de profundidad
+    public boolean comprobarCadena(Arbol arbol){
+
+        ArrayList<movimiento> movimientos = arbol.getMovimientos();
+        // recorremos los movimientos
+        for (movimiento movimiento : movimientos) {
+            // movemos el bloque
+            //System.out.println("Moviendo: "+movimiento.xOrigen+", "+movimiento.yOrigen+" -> "+movimiento.xDestino+", "+movimiento.yDestino);
+            puzzle.mover(movimiento.xDestino, movimiento.yDestino, movimiento.xOrigen, movimiento.yOrigen);
+        }
+        // verificamos si el puzzle esta resuelto
+        if(movimientos.size()>1){
+            //puzzle.showMatriz();
+        }
+        if (puzzle.esFinal()){
+            // salimos del ciclo
+            //System.out.println("Solucion encontrada");
+            // devolvemos el puzzle a su origen
             for (int i = movimientos.size() - 1; i >= 0; i--) {
                 movimiento movimiento = movimientos.get(i);
                 puzzle.mover(movimiento.xOrigen, movimiento.yOrigen, movimiento.xDestino, movimiento.yDestino);
             }
             puzzle.movimientos = 0;
-            
-
+            return true;
         }
-        // si ninguno de los hijos es la solucion agregamos un nivel de profundidad por cada hijo
-        for (Arbol hijo : hijos) {
-            addProfundidad(hijo, hijo.profundidad);
+        // devolvemos el puzzle a su origen
+        for (int i = movimientos.size() - 1; i >= 0; i--) {
+            movimiento movimiento = movimientos.get(i);
+            puzzle.mover(movimiento.xOrigen, movimiento.yOrigen, movimiento.xDestino, movimiento.yDestino);
         }
+        puzzle.movimientos = 0;
+        //puzzle.showMatriz();
         return false;
     }
 
@@ -185,7 +178,7 @@ public class Profundidad {
      */
     public ArrayList<movimiento> getSolucion(){
         // agregamos el primer nivel de profundidad
-        addProfundidad(arbolMovimientos, arbolMovimientos.profundidad);
+        abrirArbol(arbolMovimientos, arbolMovimientos.profundidad+1);
         // retornamos la solucion
         return solucion;
     }
