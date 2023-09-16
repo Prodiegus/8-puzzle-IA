@@ -158,7 +158,7 @@ public class Ampliada {
             }
             if (puzzle.esFinal()){
                 // si el puzzle esta resuelto guardamos la solucion
-                // System.out.println("Solucion encontrada");
+                //System.out.println("Solucion encontrada profundidad: "+profundidad);
                 solucion = movimientos;
                 // salimos del ciclo
                 return true;
