@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class main {
     public static void main(String[] args) {
@@ -34,6 +35,11 @@ public class main {
         puzzle.showMatriz();
         // creamos una instancia de la clase Ampliada
         ArrayList<movimiento> solucion = new ArrayList<>();
+        // pasuamos la ejecucion del programa hasta recibir un enter
+        System.out.println("Presione enter para continuar");
+        Scanner scanner = new Scanner(System.in);
+        scanner.nextLine();
+        long tiempoInicio = System.currentTimeMillis();
         if (DFA) {
             Ampliada ampliada = new Ampliada(movimientosMaximos, puzzle);
             // ejecutamos el algoritmo de busqueda
@@ -43,6 +49,7 @@ public class main {
             // ejecutamos el algoritmo de busqueda
             solucion = profundidad.getSolucion();
         }
+        long tiempoFin = System.currentTimeMillis();
         // mostramos la solucion
         System.out.println("Solucion: ");
         for (movimiento mov : solucion) {
@@ -58,6 +65,13 @@ public class main {
         }else{
             System.out.println("La matriz no esta ordenada, no hay solucion");
         }
-    
+        long tiempoTotal = tiempoFin - tiempoInicio;
+        // si el tiempo en mili segundos es mayor a 1000 lo convertimos a segundos
+        if (tiempoTotal > 1000) {
+            tiempoTotal = tiempoTotal / 1000;
+            System.out.println("Tiempo total: " + tiempoTotal + " [s]");
+        }else{
+            System.out.println("Tiempo total: " + tiempoTotal + " [ms]");
+        }
     }
 }
